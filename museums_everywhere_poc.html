@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Museums Everywhere</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--ink:#1a1714;--paper:#f7f4ee;--warm:#e0d9cc;--gold:#9a7c4a;--rust:#8b3a2a;--mid:#6b6157;--light:#ede8de;--serif:'Cormorant Garamond',Georgia,serif;--mono:'DM Mono',monospace}
+html,body{height:100%;background:var(--paper);color:var(--ink);font-family:var(--serif)}
+body{display:flex;flex-direction:column;min-height:100vh}
+header{padding:2rem 3rem 1.5rem;display:flex;align-items:baseline;gap:1.5rem;border-bottom:1px solid var(--warm)}
+.wordmark{font-size:1.05rem;font-weight:300;letter-spacing:.12em;text-transform:uppercase}
+.wordmark span{color:var(--gold)}
+.tagline{font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;color:var(--mid);text-transform:uppercase}
+main{flex:1;display:grid;grid-template-columns:1fr 1fr;max-width:1200px;width:100%;margin:0 auto;padding:3rem}
+.input-side{padding-right:3rem;border-right:1px solid var(--warm);display:flex;flex-direction:column;gap:1.4rem}
+.slabel{font-family:var(--mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.main-prompt{font-size:1.8rem;font-weight:300;line-height:1.35;font-style:italic}
+.sub-prompt{font-size:.98rem;font-weight:300;line-height:1.7;color:var(--mid)}
+.upload-area{border:1px dashed var(--warm);padding:1rem 1.2rem;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.upload-area:hover{border-color:var(--gold);background:rgba(154,124,74,.04)}
+.upload-area input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mid)}
+#uploadPreview{max-height:140px;max-width:100%;object-fit:contain;display:none;margin:.6rem auto 0}
+textarea{width:100%;min-height:130px;background:var(--light);border:1px solid var(--warm);padding:1rem 1.2rem;font-family:var(--serif);font-size:1rem;font-weight:300;color:var(--ink);resize:vertical;outline:none;line-height:1.6;transition:border-color .2s}
+textarea::placeholder{color:rgba(107,97,87,.45);font-style:italic}
+textarea:focus{border-color:var(--gold)}
+.spark-btn{background:var(--ink);color:var(--paper);border:none;padding:.9rem 2rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:background .2s;align-self:flex-start}
+.spark-btn:hover:not(:disabled){background:var(--gold)}
+.spark-btn:disabled{opacity:.4;cursor:not-allowed}
+.examples{display:flex;flex-direction:column;gap:.45rem}
+.elabel{font-family:var(--mono);font-size:.57rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mid)}
+.epill{background:none;border:1px solid var(--warm);padding:.5rem .8rem;font-family:var(--serif);font-size:.88rem;font-style:italic;color:var(--mid);cursor:pointer;text-align:left;transition:all .18s;line-height:1.4}
+.epill:hover{border-color:var(--gold);color:var(--ink);background:rgba(154,124,74,.04)}
+.spark-side{padding-left:3rem;display:flex;flex-direction:column;gap:1.4rem}
+.spark-empty{flex:1;display:flex;flex-direction:column;justify-content:center;gap:1rem;padding:2rem 0}
+.set{font-size:1.5rem;font-weight:300;font-style:italic;line-height:1.4}
+.seb{font-size:.95rem;font-weight:300;line-height:1.8;color:var(--mid)}
+.spark-loading{display:none;align-items:center;gap:1rem;padding:2rem 0}
+.spark-loading.active{display:flex}
+.dots{display:flex;gap:6px}
+.dots span{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse 1.4s ease-in-out infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.ltxt{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--mid);text-transform:uppercase}
+.spark-result{display:none;flex-direction:column;gap:1.5rem;animation:fi .6s ease}
+.spark-result.active{display:flex}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.conn{border-left:2px solid var(--gold);padding-left:1.2rem}
+.connlabel{font-family:var(--mono);font-size:.57rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+.conntext{font-size:1.4rem;font-weight:300;font-style:italic;line-height:1.45}
+.sbody{font-size:.98rem;font-weight:300;line-height:1.85}
+.sbody p{margin-bottom:1rem}
+.sbody p:last-child{margin-bottom:0}
+.sthread{background:var(--light);padding:1.1rem 1.3rem;border-top:2px solid var(--rust);display:none}
+.sthread.active{display:block}
+.stlabel{font-family:var(--mono);font-size:.57rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rust);margin-bottom:.45rem}
+.sttext{font-size:.92rem;font-weight:300;font-style:italic;line-height:1.65}
+.again{background:none;border:1px solid var(--warm);padding:.55rem 1.1rem;font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);cursor:pointer;align-self:flex-start;transition:all .18s}
+.again:hover{border-color:var(--gold);color:var(--gold)}
+footer{padding:1.1rem 3rem;border-top:1px solid var(--warm);display:flex;justify-content:space-between;align-items:center}
+.fnote{font-family:var(--mono);font-size:.57rem;letter-spacing:.1em;color:var(--mid);text-transform:uppercase}
+@media(max-width:760px){main{grid-template-columns:1fr;padding:1.5rem}.input-side{padding-right:0;border-right:none;border-bottom:1px solid var(--warm);padding-bottom:2rem}.spark-side{padding-left:0}header{padding:1.5rem 1.5rem 1rem;flex-wrap:wrap;gap:.5rem}footer{padding:1rem 1.5rem;flex-direction:column;gap:.4rem;align-items:flex-start}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wordmark">Museums <span>Everywhere</span></div>
+  <div class="tagline">Proof of Concept &nbsp;&middot;&nbsp; Mark Walhimer &nbsp;&middot;&nbsp; 2026</div>
+</header>
+<main>
+  <div class="input-side">
+    <div class="slabel">What are you seeing right now?</div>
+    <div class="main-prompt">Tell me what is in front of you.</div>
+    <div class="sub-prompt">Not what it is. What you notice. Something on the street this morning. A detail in a cafe. Anything that caught your eye. Anywhere.</div>
+    <div class="upload-area" id="uploadArea">
+      <input type="file" id="imageInput" accept="image/*">
+      <div class="upload-label" id="uploadLabel">+ Attach a photo (optional)</div>
+      <img id="uploadPreview" alt="">
+    </div>
+    <textarea id="descInput" placeholder="An old man feeding pigeons. The way light hits a glass of water. A building that feels like it is watching you. Rust on a pipe. Anything."></textarea>
+    <button class="spark-btn" id="sparkBtn" onclick="getSpark()">Find the spark</button>
+    <div class="examples">
+      <div class="elabel">Try one of these</div>
+      <button class="epill" onclick="setEx(this)">A French bulldog on a leash, looking up at its owner</button>
+      <button class="epill" onclick="setEx(this)">Scaffolding casting long shadows on a brick wall</button>
+      <button class="epill" onclick="setEx(this)">Two old men playing chess in a park, not speaking</button>
+      <button class="epill" onclick="setEx(this)">Sand at the edge of water, the line where wet meets dry</button>
+    </div>
+  </div>
+  <div class="spark-side">
+    <div class="slabel">The spark</div>
+    <div class="spark-empty" id="sparkEmpty">
+      <div class="set">The museum visit does not end when you walk out the door.</div>
+      <div class="seb">Tell me what you are looking at and I will show you the thread that connects it to something a museum has been holding for you.<br><br>Not facts. Not a label. The thing underneath.</div>
+    </div>
+    <div class="spark-loading" id="sparkLoading">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <div class="ltxt">Finding the connection</div>
+    </div>
+    <div class="spark-result" id="sparkResult">
+      <div class="conn">
+        <div class="connlabel">The connection</div>
+        <div class="conntext" id="connText"></div>
+      </div>
+      <div class="sbody" id="sparkBody"></div>
+      <div class="sthread" id="sparkThread">
+        <div class="stlabel">If you want to follow this</div>
+        <div class="sttext" id="threadText"></div>
+      </div>
+      <button class="again" onclick="reset()">Back</button>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="fnote">Museums Everywhere &nbsp;&middot;&nbsp; Mark Walhimer</div>
+  <div class="fnote">Powered by Anthropic Claude</div>
+</footer>
+<script>
+let img64=null,imgType='image/jpeg';
+document.getElementById('imageInput').addEventListener('change',function(e){
+  const f=e.target.files[0];if(!f)return;
+  imgType=f.type||'image/jpeg';
+  const r=new FileReader();
+  r.onload=ev=>{
+    img64=ev.target.result.split(',')[1];
+    const p=document.getElementById('uploadPreview');
+    p.src=ev.target.result;p.style.display='block';
+    document.getElementById('uploadLabel').textContent='Photo attached';
+  };
+  r.readAsDataURL(f);
+});
+function setEx(b){document.getElementById('descInput').value=b.textContent.trim();}
+function reset(){
+  document.getElementById('sparkResult').classList.remove('active');
+  document.getElementById('sparkEmpty').style.display='flex';
+  document.getElementById('descInput').value='';
+  document.getElementById('uploadPreview').style.display='none';
+  document.getElementById('uploadLabel').textContent='+ Attach a photo (optional)';
+  img64=null;
+}
+const SYS=`You are the interpretive voice of Museums Everywhere, a concept by museum planner Mark Walhimer.
+
+Your purpose is NOT facts or encyclopedia content. You are not Wikipedia, not a museum label, not a textbook.
+
+Your purpose is THE SPARK. The feeling someone gets standing in front of a great work of art when something shifts inside them. Informal learning. Wonder that opens a door and lets curiosity walk through on its own.
+
+The Five-Minute Contract: stand in front of a great artwork for five minutes. It changes how you see the world. You walk out and notice similar colors, tensions, and emotions in ordinary things you pass. The museum visit does not end at the door. Museums Everywhere is that effect made continuous and ambient.
+
+When someone describes what they see in daily life, find the emotional and sensory thread connecting it to something real in museum collections. Not to teach them. To make them feel something they did not feel thirty seconds ago.
+
+Respond ONLY with valid JSON, no markdown:
+{"connection":"1-2 sentences naming a specific real artwork, artist, or collection this moment connects to. Real works, real institutions. Make it feel like recognition not information.","spark":"<p>The emotional and perceptual territory shared between what they are seeing and that work. Not art history. The quality of light, weight, tension, loneliness, humor, or strangeness that connects them.</p><p>Go deeper. What was the artist after? What is the person in front of you after without knowing it?</p>","thread":"1-2 sentences. A door left slightly open. Not homework. Leave them wanting not satisfied."}
+
+Do not be encyclopedic. Be the knowledgeable friend who says: wait, do you know what this reminds me of?`;
+
+async function getSpark(){
+  const desc=document.getElementById('descInput').value.trim();
+  if(!desc&&!img64){document.getElementById('descInput').focus();return;}
+  document.getElementById('sparkEmpty').style.display='none';
+  document.getElementById('sparkResult').classList.remove('active');
+  document.getElementById('sparkLoading').classList.add('active');
+  document.getElementById('sparkBtn').disabled=true;
+  try{
+    const content=[];
+    if(img64)content.push({type:'image',source:{type:'base64',media_type:imgType,data:img64}});
+    content.push({type:'text',text:desc||'I attached a photo. What does it connect to?'});
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYS,messages:[{role:'user',content}]})
+    });
+    const data=await resp.json();
+    const raw=(data.content||[]).map(b=>b.text||'').join('');
+    let p;
+    try{p=JSON.parse(raw.replace(/```json|```/g,'').trim());}
+    catch(e){p={connection:'Something unexpected surfaced.',spark:'<p>'+raw+'</p>',thread:''};}
+    document.getElementById('connText').textContent=p.connection||'';
+    document.getElementById('sparkBody').innerHTML=p.spark||'';
+    const thr=document.getElementById('sparkThread');
+    if(p.thread){document.getElementById('threadText').textContent=p.thread;thr.classList.add('active');}
+    else{thr.classList.remove('active');}
+    document.getElementById('sparkLoading').classList.remove('active');
+    document.getElementById('sparkResult').classList.add('active');
+  }catch(err){
+    document.getElementById('sparkLoading').classList.remove('active');
+    document.getElementById('sparkEmpty').style.display='flex';
+    console.error(err);
+  }
+  document.getElementById('sparkBtn').disabled=false;
+}
+document.getElementById('descInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))getSpark();});
+</script>
+</body>
+</html>
